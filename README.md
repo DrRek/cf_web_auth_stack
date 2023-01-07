@@ -1,15 +1,13 @@
-# Welcome to your CDK TypeScript project
+# CDK TypeScript project to deploy a small serverless with google authentication
 
-You should explore the contents of this project. It demonstrates a CDK app with an instance of a stack (`CdkAuthWebappStack`)
-which contains an Amazon SQS queue that is subscribed to an Amazon SNS topic.
+## To launch this project in your AWS account
+`git clone https://github.com/DrRek/cf_web_auth_stack`
+`cd cf_web_auth_stack`
+set up a google project as explained below
+`export DOMAIN_NAME=<any prefix you wish>` this will be used to create resources
+`export GOOGLE_CLIENT_ID=<client it taken from google cloud console>`
+`export GOOGLE_CLIENT_SECRET=<client secret taken from google cloud console>`
+`cdk deploy` or `cdk watch`
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
-
-## Useful commands
-
-* `npm run build`   compile typescript to js
-* `npm run watch`   watch for changes and compile
-* `npm run test`    perform the jest unit tests
-* `cdk deploy`      deploy this stack to your default AWS account/region
-* `cdk diff`        compare deployed stack with current state
-* `cdk synth`       emits the synthesized CloudFormation template
+## Setup a google project
+TODO
