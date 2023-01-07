@@ -3,6 +3,6 @@ exports.handler = async function(event) {
   return {
     statusCode: 200,
     headers: { "Content-Type": "text/plain" },
-    body: `Hello to you, authenticated users! You've hit ${event.path}\nIf you see this and you're not authenticated something is wrong`,
+    body: `Hello to you, authenticated users! You've hit ${event.path}\nIf you see this your request went through`,
   };
 };

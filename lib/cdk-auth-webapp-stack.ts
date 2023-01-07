@@ -17,28 +17,11 @@ export class CdkAuthWebappStack extends Stack {
      * INIT CONFIGURATION
      * setting up required paramters and checking their value
      */
-    const domainPrefixParam = new CfnParameter(this, 'DomainPrefix', {
-      type: 'String',
-      description: 'You have to set it in google cloud as well', //(TODO: add link to explain properly)
-      default: process.env.DOMAIN_NAME || ''
-    })
-
-    const googleClientIdParam = new CfnParameter(this, 'GoogleClientId', {
-      type: 'String',
-      description: 'From google project',
-      noEcho: true,
-      default: process.env.GOOGLE_CLIENT_ID || ''
-    })
-
-    const googleClientSecretParam = new CfnParameter(this, 'GoogleClientSecret', {
-      type: 'String',
-      description: 'From google project',
-      noEcho: true,
-      default: process.env.GOOGLE_CLIENT_SECRET || ''
-    })
-
-    if(!domainPrefixParam.value || !googleClientIdParam.value || !googleClientSecretParam.value){
-      throw new Error('Make sure you initialized DomainPrefix, GoogleClientId and GoogleClientSecret in the stack parameters')
+    const domainPrefixParam = process.env.DOMAIN_NAME
+    const googleClientIdParam = process.env.GOOGLE_CLIENT_ID
+    const googleClientSecretParam = process.env.GOOGLE_CLIENT_SECRET
+    if(!domainPrefixParam || !googleClientIdParam || !googleClientSecretParam){
+      throw new Error('Make sure you initialized DOMAIN_NAME, GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in your environment')
     }
 
 
@@ -49,7 +32,7 @@ export class CdkAuthWebappStack extends Stack {
 
     // This will create the bucket that stores the frontend code
     const frontendbucket = new s3.Bucket(this, 'FrontendBucket', {
-      bucketName: `${domainPrefixParam.valueAsString}-frontend-bucket`,
+      bucketName: `${domainPrefixParam}-frontend-bucket`,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       encryption: s3.BucketEncryption.S3_MANAGED,
       enforceSSL: true,
@@ -126,8 +109,8 @@ export class CdkAuthWebappStack extends Stack {
 
     // This integrates the existing user pool with Google
     const identityprovidergoogle = new cognito.UserPoolIdentityProviderGoogle(this, 'IdentityProviderGoogle', {
-      clientId: googleClientIdParam.valueAsString,
-      clientSecret: googleClientSecretParam.valueAsString,
+      clientId: googleClientIdParam,
+      clientSecret: googleClientSecretParam,
       userPool: userpool,
       attributeMapping: {
         email: cognito.ProviderAttribute.GOOGLE_EMAIL
@@ -138,7 +121,7 @@ export class CdkAuthWebappStack extends Stack {
     // This will create the Hosted UI URL
     userpool.addDomain('Domain', {
       cognitoDomain: {
-        domainPrefix: domainPrefixParam.valueAsString
+        domainPrefix: domainPrefixParam
       }
     })
 
@@ -193,7 +176,7 @@ export class CdkAuthWebappStack extends Stack {
 
     // This defines the apigw
     const backendapigw = new apigw.RestApi(this, 'BackendApigw', {
-      restApiName: domainPrefixParam.valueAsString,
+      restApiName: domainPrefixParam,
       defaultCorsPreflightOptions: {
         "allowOrigins": apigw.Cors.ALL_ORIGINS,
         "allowMethods": apigw.Cors.ALL_METHODS,
@@ -221,12 +204,12 @@ export class CdkAuthWebappStack extends Stack {
      * region - used to define both the Cognito Hosted UI url and the APIGateway url
      * cognito_client_id - supplied to the Hosted UI get request to perform authentication
      */
-    const s3deploymentfrontend = new s3deployment.BucketDeployment(this, 'DeployFrontEnd', {
+    new s3deployment.BucketDeployment(this, 'DeployFrontEnd', {
       sources: [
         s3deployment.Source.asset('./frontend'),
         s3deployment.Source.data('constants.js', `
           const constants = {
-            domainPrefix:'${domainPrefixParam.valueAsString}', 
+            domainPrefix:'${domainPrefixParam}', 
             region:'${this.region}', 
             cognito_client_id:'${client.userPoolClientId}', 
             apigw_id:'${backendapigw.restApiId}'
