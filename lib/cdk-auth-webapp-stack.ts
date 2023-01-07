@@ -178,8 +178,13 @@ export class CdkAuthWebappStack extends Stack {
     const backendapigw = new apigw.RestApi(this, 'BackendApigw', {
       restApiName: domainPrefixParam,
       defaultCorsPreflightOptions: {
-        "allowOrigins": apigw.Cors.ALL_ORIGINS,
-        "allowMethods": apigw.Cors.ALL_METHODS,
+        allowHeaders: [
+          'Content-Type',
+          'Authorization',
+        ],
+        allowMethods: ['OPTIONS', 'GET'],
+        allowCredentials: true,
+        allowOrigins: ['*']
       }
     })
 
@@ -189,7 +194,7 @@ export class CdkAuthWebappStack extends Stack {
     })
 
     // This is the lambda resource that define the API
-    const authorizedresource = backendapigw.root.addMethod('GET', lambdaapigwintegration, {
+    backendapigw.root.addMethod('GET', lambdaapigwintegration, {
       authorizer: backendapiauthorizer,
       authorizationType: apigw.AuthorizationType.COGNITO
     })
