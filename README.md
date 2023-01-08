@@ -1,5 +1,10 @@
 # CDK TypeScript project to deploy a small serverless with google authentication
 
+![Preview Image](https://raw.githubusercontent.com/DrRek/cf_web_auth_stack/main/docs/resources/simplewebauth.png)
+
+## Description
+description
+
 ## To launch this project in your AWS account
 `git clone https://github.com/DrRek/cf_web_auth_stack`
 `cd cf_web_auth_stack`
