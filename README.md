@@ -3,7 +3,9 @@
 ![Preview Image](https://raw.githubusercontent.com/DrRek/cf_web_auth_stack/main/docs/resources/simplewebauth.png)
 
 ## Description
-description
+This stack contains all the required resources to create a serverless app integrated with google authentication.
+A sample frontend hosted on bucket can be easily replaced with any other backend, stored in any other place, using any stack (React, Angular, etc.).
+The frontend receives the oauth tokens from Cognito. With these, adding the `Authentication: Bearer ${id_token}` header to any API Gateway endpoint, it is possible to prevent any authenticated app from executing backend commands. If using lambda's as backend, the identity of the logged user [can be accessed in the event object](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-enable-cognito-user-pool.html).
 
 ## To launch this project in your AWS account
 `git clone https://github.com/DrRek/cf_web_auth_stack`
