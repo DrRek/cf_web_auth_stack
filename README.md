@@ -31,6 +31,10 @@ export GOOGLE_CLIENT_SECRET=<client secret taken from google cloud console>
 
 `cdk deploy` or `cdk watch`
 
+* Check the output of the command for a link similar to the following, use the printed link in your browser to access the application.
+
+`CdkAuthWebappStack.YourPublicCloudFrontURL = https://d3td55vopauj3g.cloudfront.net/`
+
 ## Setup a google project
 To setup google authentication you will need a google project. To do so, follow these step.
 * Follow [these steps](https://cloud.google.com/appengine/docs/standard/nodejs/building-app/creating-project) to create a new project
@@ -45,7 +49,7 @@ To setup google authentication you will need a google project. To do so, follow 
 * Make sure that "Authorized JavaScript origins" contains `https://${DOMAIN_NAME}.auth.${REGION}.amazoncognito.com` where DOMAIN_NAME is the environment variable setted in the previous section and REGION is the aws region where you will deploy the resource (ex. https://webapp-with-webauth.auth.eu-central-1.amazoncognito.com)
 * Make sure that "Authorized redirect URI" contains `https://${DOMAIN_NAME}.auth.${REGION}.amazoncognito.com/oauth2/idpresponse` where DOMAIN_NAME is the environment variable setted in the previous section and REGION is the aws region where you will deploy the resource (ex. https://webapp-with-webauth.auth.eu-central-1.amazoncognito.com)
 * Click on create
-* Download or memorize somewhere the client id and client secret, these will need to be added in the environment variables as respectively GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET as metioned in the previous section
+* Download or memorize somewhere the client id and client secret, these will need to be added in the environment variables as respectively GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET as metioned in the previous section.
 
 
 ## Future improvements
