@@ -10,17 +10,24 @@ The frontend receives the oauth tokens from Cognito. With these, adding the `Aut
 * Make sure your aws cli is [installed and configured](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 * Make sure your cdk v2 is [installed](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) 
 * Clone the repository 
+
 `git clone https://github.com/DrRek/cf_web_auth_stack`
 * Open the project folder
+
 `cd cf_web_auth_stack`
 * Set up a google project as explained below
 * Export the DOMAIN_NAME environment variable used as prefix while creating the resources in your accocunt
+
 `export DOMAIN_NAME=<any prefix you wish>`
 * Export the environment variable with google project configuration
-`export GOOGLE_CLIENT_ID=<client it taken from google cloud console>`
-`export GOOGLE_CLIENT_SECRET=<client secret taken from google cloud console>`
+
+```
+export GOOGLE_CLIENT_ID=<client it taken from google cloud console>
+export GOOGLE_CLIENT_SECRET=<client secret taken from google cloud console>
+```
 * Make any required edit to the stack
 * Deploy the application
+
 `cdk deploy` or `cdk watch`
 
 ## Setup a google project
