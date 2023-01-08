@@ -8,6 +8,7 @@ import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as s3deployment from 'aws-cdk-lib/aws-s3-deployment';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import { CfnDistribution } from 'aws-cdk-lib/aws-cloudfront';
 
 export class CdkAuthWebappStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -49,19 +50,12 @@ export class CdkAuthWebappStack extends Stack {
      * this is sadly used only to easily give https access to the website as it is required by cognit
      */
 
-    // This is used to give the CF distribution access to the bucket
-    // TODO: IDK why it says "legacy", I need to make it select the other
-    const cfdistributionoriginaccessidentity = new cloudfront.OriginAccessIdentity(this, 'CFOriginAccessIdentity', {
-      comment: "Used to give bucket read to cloudfront"
-    })
-
     // This is used to create the actual cf distribution
     const cfdistribution = new cloudfront.CloudFrontWebDistribution(this, 'CFDistribution', {
       originConfigs: [
         {
           s3OriginSource: {
             s3BucketSource: frontendbucket,
-            originAccessIdentity: cfdistributionoriginaccessidentity
           },
           behaviors: [{ 
             isDefaultBehavior: true,
@@ -78,21 +72,45 @@ export class CdkAuthWebappStack extends Stack {
       ]
     })
 
-    // This is also used to give the CF distribution access to the bucket
-    frontendbucket.grantRead(cfdistributionoriginaccessidentity)
+    /**
+     * Following here a workaround to work with OAC instead of OAI which are deprecated
+     * The following code was adapted from a workaround of an open issue on GitHub.
+     * More details: https://github.com/aws/aws-cdk/issues/21771
+     */
+    const cfdistributionoac = new cloudfront.CfnOriginAccessControl(this, 'CFOriginAccessControl', {
+      originAccessControlConfig: {
+        description: 'Origin Access Control for S3 bucket',
+        name: 'CFOriginAccessControl',
+        originAccessControlOriginType: 's3',
+        signingBehavior: 'always',
+        signingProtocol: 'sigv4',
+      }
+    })
+    const cfnd = cfdistribution.node.defaultChild as CfnDistribution
+    cfnd.addPropertyOverride('DistributionConfig.Origins.0.OriginAccessControlId', cfdistributionoac.getAtt('Id'))
+    const distribution_arn = cdk.Arn.format({
+      service: 'cloudfront',
+      resource: 'distribution',
+      region: '',
+      resourceName: cfdistribution.distributionId,
+      arnFormat: cdk.ArnFormat.SLASH_RESOURCE_NAME,
+    }, this)
+    frontendbucket.addToResourcePolicy(
+        new iam.PolicyStatement({
+          effect: iam.Effect.ALLOW,
+          actions: [ 's3:GetObject' ],
+          principals: [ new iam.ServicePrincipal('cloudfront.amazonaws.com') ],
+          resources: [ frontendbucket.arnForObjects('*') ],
+          conditions: {
+              'ArnEquals': {
+                  'AWS:SourceArn': distribution_arn,
+              },
+          },
+        })
+      )
 
     // This is used by cognito to allow list URL that the Hosted UI can redirect to
     const CLOUDFRONT_PUBLIC_URL = `https://${cfdistribution.distributionDomainName}/`
-
-    /*
-    // This is used to give CloudFormation permission to invalidate a cf distribution
-    //TODO: probably to delete
-    new iam.PolicyStatement({
-      effect: iam.Effect.ALLOW,
-      actions: ['cloudfront:CreateInvalidation'],
-      resources: [`"arn:aws:cloudfront::${this.account}:distribution/${cfdistribution.distributionId}"`]
-    });
-    */
 
 
 
