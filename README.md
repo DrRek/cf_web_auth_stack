@@ -32,8 +32,24 @@ export GOOGLE_CLIENT_SECRET=<client secret taken from google cloud console>
 `cdk deploy` or `cdk watch`
 
 ## Setup a google project
-TODO
+To setup google authentication you will need a google project. To do so, follow these step.
+* Follow [these steps](https://cloud.google.com/appengine/docs/standard/nodejs/building-app/creating-project) to create a new project
+* Navigate to the [google cloud console](https://console.cloud.google.com)
+* Make sure you've selected your newly created project on the top left
+* In the search bar write and select "OAuth consent screen"
+* [Configure the OAuth consent screen](https://developers.google.com/workspace/guides/configure-oauth-consent), make sure add "amazoncognito.com" as one of the authorized domains
+* Select "Creadentials" in the left bar
+* Click on "Create credentials"
+* Select "ID client OAuth"
+* Select "Web application" as application type
+* Make sure that "Authorized JavaScript origins" contains `https://${DOMAIN_NAME}.auth.${REGION}.amazoncognito.com` where DOMAIN_NAME is the environment variable setted in the previous section and REGION is the aws region where you will deploy the resource (ex. https://webapp-with-webauth.auth.eu-central-1.amazoncognito.com)
+* Make sure that "Authorized redirect URI" contains `https://${DOMAIN_NAME}.auth.${REGION}.amazoncognito.com/oauth2/idpresponse` where DOMAIN_NAME is the environment variable setted in the previous section and REGION is the aws region where you will deploy the resource (ex. https://webapp-with-webauth.auth.eu-central-1.amazoncognito.com)
+* Click on create
+* Download or memorize somewhere the client id and client secret, these will need to be added in the environment variables as respectively GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET as metioned in the previous section
+
 
 ## Future improvements
 * Improve modularity and deploy as npm package
+* Integrate it in pipelines
+* Work with multiple environments
 
